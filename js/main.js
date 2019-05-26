@@ -1,18 +1,9 @@
-//██████╗  █████╗ ████████╗████████╗██╗     ███████╗███████╗██╗  ██╗██╗██████╗ ███████╗
-//██╔══██╗██╔══██╗╚══██╔══╝╚══██╔══╝██║     ██╔════╝██╔════╝██║  ██║██║██╔══██╗██╔════╝
-//██████╔╝███████║   ██║      ██║   ██║     █████╗  ███████╗███████║██║██████╔╝███████╗
-//██╔══██╗██╔══██║   ██║      ██║   ██║     ██╔══╝  ╚════██║██╔══██║██║██╔═══╝ ╚════██║
-//██████╔╝██║  ██║   ██║      ██║   ███████╗███████╗███████║██║  ██║██║██║     ███████║
-//╚═════╝ ╚═╝  ╚═╝   ╚═╝      ╚═╝   ╚══════╝╚══════╝╚══════╝╚═╝  ╚═╝╚═╝╚═╝     ╚══════╝
-//
-// v1.1 Please see http://www.github.com/Scoutski/mystery/ for information about this release.
-
 $(document).ready(function() {
 
   var myPlayerNumber = undefined;
   var enemyPlayerNumber = undefined;
   var name = prompt('Ingresa tu nombre');
-  var letters = "abcde".split('');
+  var letters = "abcdefgh".split('');
   var boardArray = [];
   var enemyArray = [];
   var myShips = [];
@@ -96,9 +87,9 @@ $(document).ready(function() {
   };
 
   var createBoard = function() {
-    for (var i = 0; i < 8; i++) {
+    for (var i = 0; i < 5; i++) {
       var tempArray = [];
-      for (var j = 1; j < 9; j++) {
+      for (var j = 1; j < 6; j++) {
         var $cell = $('<div></div>').attr('id', (letters[i] + j)).addClass('myBoardSquare').addClass('grow').appendTo('#boardDiv');
         $cell.text(($cell.attr('id').toUpperCase()));
         tempArray.push(letters[i] + j);
@@ -108,9 +99,9 @@ $(document).ready(function() {
   }
 
   var createEnemyBoard = function() {
-    for (var i = 0; i < 8; i++) {
+    for (var i = 0; i < 5; i++) {
       var tempArray = [];
-      for (var j = 1; j < 9; j++) {
+      for (var j = 1; j < 6; j++) {
         var $cell = $('<div></div>').attr('id', 'e' + (letters[i] + j)).addClass('enemyBoardSquare').addClass('grow').appendTo('#boardDiv');
         $cell.text(($cell.attr('id').slice(1).toUpperCase()));
         tempArray.push(letters[i] + j);
@@ -167,8 +158,6 @@ $(document).ready(function() {
   }
 
   var horizontalPlace = function(currentShip, rIndex, cIndex) {
-    //Function purpose:
-    //This function is wholly responsible for drawing the markers on the board to show the location of the ships that have been placed horizontally and for passing the #id's of the ship locations into the myShips array. 
     if (horizontalCollisionCheck(currentShip, rIndex, cIndex) &&
       legalHorizontalMove(currentShip, cIndex)) {
       var tempShip = [];
@@ -187,8 +176,6 @@ $(document).ready(function() {
   }
 
   var verticalPlace = function(currentShip, rIndex, cIndex) {
-    //Function purpose:
-    //This function is wholly responsible for drawing the markers on the board to show the location of the ships that have been placed vertically and for passing the #id's of the ship locations into the myShips array.
     if (verticalCollisionCheck(currentShip, rIndex, cIndex) &&
       legalVerticalMove(currentShip, rIndex)) {
       var tempShip = [];
@@ -253,8 +240,6 @@ $(document).ready(function() {
   }
 
   var checkForStart = function() {
-    //Function Purpose:
-    //This function checks the player_data folder for the opposite player to determine if their board has ben placed and if their ships can be downloaded. If they are ready, it downloads the ships locally.
     var startTimer = setInterval(function() {
       tempLocation = 'https://barquitos-42dff.firebaseio.com/datos/' + enemyPlayerNumber + '/';
       tempFirebase = new Firebase(tempLocation);
@@ -375,7 +360,6 @@ $(document).ready(function() {
         setTimeout(function() {
           turnCheck();
         }, 3000);
-        //}
         return;
       } else {
         return;
@@ -430,7 +414,6 @@ $(document).ready(function() {
         }
       }
       if (sinkCount === currentShip.length) {
-        var audioBg = new Audio('media/sunkBattleship.mp3');
         sinkShipMessage(currentShip.length);
         setTimeout(function() {
           audioBg.play();
@@ -441,8 +424,6 @@ $(document).ready(function() {
   };
 
   var sinkShipMessage = function(shipLength) {
-    //Function Purpose:
-    //This function's only purpose is to determine which ship was sunk and append a message to the status log with the correct ship name.
     switch (shipLength) {
       case 5:
         $("<div><strong>BARCO HUNDIDO</strong></div>").appendTo('#statusLog')
@@ -535,7 +516,7 @@ $(document).ready(function() {
   function syncChanges(list, ref) {
     ref.on('child_added', function _add(snap, prevChild) {
       var data = snap.val();
-      data.$id = snap.key(); // assumes data is always an object
+      data.$id = snap.key(); 
       var pos = positionAfter(list, prevChild);
       list.splice(pos, 0, data);
     });
@@ -549,7 +530,7 @@ $(document).ready(function() {
       var i = positionFor(list, snap.key());
       if (i > -1) {
         list[i] = snap.val();
-        list[i].$id = snap.key(); // assumes data is always an object
+        list[i].$id = snap.key(); 
       }
     });
     ref.on('child_moved', function _move(snap, prevChild) {
@@ -585,7 +566,6 @@ $(document).ready(function() {
   }
 
   function wrapLocalCrudOps(list, firebaseRef) {
-      // we can hack directly on the array to provide some convenience methods
       list.$add = function(data) {
         return firebaseRef.push(data);
       };
@@ -593,14 +573,13 @@ $(document).ready(function() {
         firebaseRef.child(key).remove();
       };
       list.$set = function(key, newData) {
-        // make sure we don't accidentally push our $id prop
         if (newData.hasOwnProperty('$id')) {
           delete newData.$id;
         }
         firebaseRef.child(key).set(newData);
       };
       list.$indexOf = function(key) {
-        return positionFor(list, key); // positionFor in examples above
+        return positionFor(list, key); 
       }
     }
 });
